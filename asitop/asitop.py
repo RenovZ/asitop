@@ -142,18 +142,18 @@ def main():
 
     print("\n[2/3] Starting powermetrics process\n")
 
-    timecode = str(int(time.time()))
+    output_path = get_powermetrics_output_path()
 
-    powermetrics_process = run_powermetrics_process(timecode,
+    powermetrics_process = run_powermetrics_process(output_path,
                                                     interval=args.interval * 1000)
 
     print("\n[3/3] Waiting for first reading...\n")
 
     def get_reading(wait=0.1):
-        ready = parse_powermetrics(timecode=timecode)
+        ready = parse_powermetrics(path=output_path)
         while not ready:
             time.sleep(wait)
-            ready = parse_powermetrics(timecode=timecode)
+            ready = parse_powermetrics(path=output_path)
         return ready
 
     ready = get_reading()
@@ -176,11 +176,11 @@ def main():
                 if count >= args.max_count:
                     count = 0
                     powermetrics_process.terminate()
-                    timecode = str(int(time.time()))
+                    output_path = get_powermetrics_output_path()
                     powermetrics_process = run_powermetrics_process(
-                        timecode, interval=args.interval * 1000)
+                        output_path, interval=args.interval * 1000)
                 count += 1
-            ready = parse_powermetrics(timecode=timecode)
+            ready = parse_powermetrics(path=output_path)
             if ready:
                 cpu_metrics_dict, gpu_metrics_dict, thermal_pressure, bandwidth_metrics, timestamp = ready
 
