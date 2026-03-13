@@ -18,7 +18,6 @@ def parse_powermetrics(path='/tmp/asitop_powermetrics', timecode="0"):
         thermal_pressure = parse_thermal_pressure(powermetrics_parse)
         cpu_metrics_dict = parse_cpu_metrics(powermetrics_parse)
         gpu_metrics_dict = parse_gpu_metrics(powermetrics_parse)
-        #bandwidth_metrics = parse_bandwidth_metrics(powermetrics_parse)
         bandwidth_metrics = None
         timestamp = powermetrics_parse["timestamp"]
         return cpu_metrics_dict, gpu_metrics_dict, thermal_pressure, bandwidth_metrics, timestamp
@@ -29,7 +28,6 @@ def parse_powermetrics(path='/tmp/asitop_powermetrics', timecode="0"):
                 thermal_pressure = parse_thermal_pressure(powermetrics_parse)
                 cpu_metrics_dict = parse_cpu_metrics(powermetrics_parse)
                 gpu_metrics_dict = parse_gpu_metrics(powermetrics_parse)
-                #bandwidth_metrics = parse_bandwidth_metrics(powermetrics_parse)
                 bandwidth_metrics = None
                 timestamp = powermetrics_parse["timestamp"]
                 return cpu_metrics_dict, gpu_metrics_dict, thermal_pressure, bandwidth_metrics, timestamp
@@ -52,8 +50,6 @@ def get_powermetrics_output_path():
 
 
 def run_powermetrics_process(output_path, nice=10, interval=1000):
-    #ver, *_ = platform.mac_ver()
-    #major_ver = int(ver.split(".")[0])
     output_file_flag = "-o"
     command = " ".join([
         "sudo nice -n",
@@ -152,7 +148,6 @@ def get_soc_info():
         "p_core_count": p_core_count,
         "gpu_core_count": get_gpu_cores()
     }
-    # TDP (power)
     if soc_info["name"] == "Apple M1 Max":
         soc_info["cpu_max_power"] = 30
         soc_info["gpu_max_power"] = 60
@@ -171,7 +166,6 @@ def get_soc_info():
     else:
         soc_info["cpu_max_power"] = 20
         soc_info["gpu_max_power"] = 20
-    # bandwidth
     if soc_info["name"] == "Apple M1 Max":
         soc_info["cpu_max_bw"] = 250
         soc_info["gpu_max_bw"] = 400

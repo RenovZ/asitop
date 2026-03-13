@@ -1,0 +1,16 @@
+[package]
+name = "asitop"
+version = "0.1.0"
+edition = "2024"
+description = "Performance monitoring CLI tool for Apple Silicon"
+license = "MIT"
+repository = "https://github.com/RenovZ/asitop"
+
+[dependencies]
+anyhow = "1.0"
+clap = { version = "4.5", features = ["derive"] }
+crossterm = "0.29"
+plist = "1.8"
+ratatui = "0.29"
+sysinfo = "0.37"
+tempfile = "3.20"

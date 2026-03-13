@@ -1,18 +1,16 @@
 # asitop
 
-![PyPI - Downloads](https://img.shields.io/pypi/dm/asitop)
-
 Performance monitoring CLI tool for Apple Silicon
 
 ![](images/asitop.png)
 
 ```shell
-uv tool install asitop
+cargo run -- --help
 ```
 
 ## What is `asitop`
 
-A Python-based `nvtop`-inspired command line tool for Apple Silicon (aka M1) Macs.
+A Rust-based `nvtop`-inspired command line tool for Apple Silicon Macs.
 
 * Utilization info:
   * CPU (E-cluster and P-cluster), GPU
@@ -20,53 +18,44 @@ A Python-based `nvtop`-inspired command line tool for Apple Silicon (aka M1) Mac
   * ANE utilization (measured by power)
 * Memory info:
   * RAM and swap, size and usage
-  * (Apple removed memory bandwidth from `powermetrics`)
 * Power info:
-  * CPU power, GPU power (Apple removed package power from `powermetrics`)
-  * Chart for CPU/GPU power
-  * Peak power, rolling average display
+  * CPU power, GPU power
+  * Rolling power history
+  * Peak power and averaged power display
 
-`asitop` uses the built-in [`powermetrics`](https://www.unix.com/man-page/osx/1/powermetrics/) utility on macOS, which allows access to a variety of hardware performance counters. Note that it requires `sudo` to run due to `powermetrics` needing root access to run. `asitop` is lightweight and has minimal performance impact.
-
-**`asitop` only works on Apple Silicon Macs on macOS Monterey!**
+`asitop` uses the built-in [`powermetrics`](https://www.unix.com/man-page/osx/1/powermetrics/) utility on macOS, which allows access to hardware performance counters. It still requires `sudo`, because `powermetrics` itself needs elevated privileges.
 
 ## Installation and Usage
 
-`asitop` is a Python-based command line tool. If you use [`uv`](https://docs.astral.sh/uv/), you can install and run it without manually managing a virtual environment.
+The active implementation in this repository is now written in Rust.
 
 ```shell
-# install from PyPI
-uv tool install asitop
-```
+# build
+cargo build
 
-For local development in this repository:
+# run
+cargo run
+
+# show help
+cargo run -- --help
+```
 
 ```shell
-# create/update the virtual environment from pyproject.toml
-uv sync
-
-# run the local CLI
-uv run asitop
+# run the release build directly
+./target/release/asitop --interval 1 --avg 30 --show-cores
 ```
 
-If you still prefer `pip`, `pip install asitop` also works.
+Available flags:
 
-```shell
-# to enter password before start
-# this mode is recommended!
-sudo asitop
-
-# it will prompt password on start
-asitop
-
-# advanced options
-asitop [-h] [--interval INTERVAL] [--color COLOR] [--avg AVG]
-optional arguments:
-  -h, --help           show this help message and exit
-  --interval INTERVAL  Display interval and sampling interval for powermetrics (seconds)
-  --color COLOR        Choose display color (0~8)
-  --avg AVG            Interval for averaged values (seconds)
+```text
+--interval <SECONDS>   Display and sampling interval
+--color <0-8>          Gauge color index
+--avg <SECONDS>        Averaging window for power metrics
+--show-cores           Show per-core details
+--max-count <N>        Restart powermetrics after N refreshes
 ```
+
+Press `q` or `Esc` to quit the TUI.
 
 ## How it works
 
@@ -74,12 +63,9 @@ optional arguments:
 
 * CPU/GPU utilization via active residency
 * CPU/GPU frequency
-* Package/CPU/GPU/ANE energy consumption
-* CPU/GPU/Media Total memory bandwidth via the DCS (DRAM Command Scheduler)
+* CPU/GPU/ANE/package energy consumption
 
-[`psutil`](https://github.com/giampaolo/psutil) is used to measure the following:
-
-* memory and swap usage
+Rust reads memory and swap usage via [`sysinfo`](https://crates.io/crates/sysinfo).
 
 [`sysctl`](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man3/sysctl.3.html) is used to measure the following:
 
@@ -90,17 +76,11 @@ optional arguments:
 
 * GPU core count
 
-Some information is guesstimate and hardcoded as there doesn't seem to be a official source for it on the system:
+Some information is guesstimated because macOS does not expose a single official source for all of it:
 
 * CPU/GPU TDP
-* CPU/GPU maximum memory bandwidth
 * ANE max power
-* Media engine max bandwidth
 
-## Why
+## Legacy Python Version
 
-Because I didn't find something like this online. Also, just curious about stuff.
-
-## Disclaimers
-
-I did this randomly don't blame me if it fried your new MacBook or something.
+The previous Python implementation is preserved under `legacy/` for reference.
